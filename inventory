@@ -1,0 +1,1 @@
+elkf ansible_host=10.0.0.108 ansible_connection=ssh ansible_user=andr ansible_ssh_pass=1qw2

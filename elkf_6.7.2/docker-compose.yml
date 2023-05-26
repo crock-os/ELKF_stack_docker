@@ -1,0 +1,67 @@
+version: '3.2'
+ 
+services:
+ filebeat:
+   image: filebeat:6.7.2
+   build:
+     context: filebeat/     
+     dockerfile: ./Dockerfile_filebeat
+   volumes:
+     - /var/lib/docker/containers:/usr/share/dockerlogs/data:ro
+     - /var/run/docker.sock:/var/run/docker.sock:ro
+   networks:
+     - elk_stack     
+ 
+ elasticsearch:
+   image: elasticsearch:6.7.2
+   build:
+     context: elasticsearch/
+     dockerfile: ./Dockerfile_ES
+   volumes:
+     - type: volume
+       source: elasticsearch
+       target: /usr/share/elasticsearch/data
+   ports:
+     - "9200:9200"
+     - "9300:9300"
+   environment:
+     ELASTIC_PASSWORD: '1qw2!QW@'
+     discovery.type: single-node
+   networks:
+    - elk_stack
+
+ logstash:
+   image: logstash:6.7.2
+   build:
+     context: logstash/
+     dockerfile: ./Dockerfile_logstash
+   ports:
+     - "5000:5000"
+     - "9600:9600"
+   volumes:
+     - /home/andr/elkf/logstash/outputs/:/usr/share/logstash/outputs/
+   networks:
+     - elk_stack
+   depends_on:
+     - elasticsearch
+ 
+ kibana:
+   image: kibana:6.7.2
+   build:
+     context: kibana/
+     dockerfile: ./Dockerfile_kibana
+   ports:
+     - "5601:5601"
+   networks:
+     - elk_stack
+   depends_on:
+     - elasticsearch
+ 
+networks:
+ elk_stack:
+   name: elk_stack
+   driver: bridge
+ 
+volumes:
+ elasticsearch:
+  name: elasticsearch

@@ -1,0 +1,29 @@
+filebeat.inputs:
+  - type: log
+    fields: 
+      source: log_file
+    enabled: true
+    paths:
+      - /usr/share/filebeat/test.log
+  - type: docker
+    fields: 
+      source: docker
+    containers:
+      path: "/usr/share/dockerlogs/data"
+      stream: "stdout"
+      ids:
+        - "*"
+      cri.parse_flags: true
+      combine_partial: true
+      exclude_files: ['\.gz$']   
+processors:
+  - add_docker_metadata:
+      host: "unix:///var/run/docker.sock"
+      matchers:
+        - fields.container.id: "self"
+ 
+filebeat.config.modules:
+  path: ${path.config}/modules.d/*.yml
+ 
+output.logstash:
+  hosts: ['logstash:5044']

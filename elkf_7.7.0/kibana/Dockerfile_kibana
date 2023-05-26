@@ -1,0 +1,2 @@
+FROM kibana:7.7.0
+COPY --chown=kibana:kibana ./kibana.yml /usr/share/kibana/config/

@@ -1,0 +1,76 @@
+-
+  name: Setup elkf
+  hosts: elkf
+  vars:
+    - version_stack: "6.7.2"
+  tasks:
+    - name: install docker
+      script: "./install_docker.sh"  
+  
+    - name: install python lib
+      shell: "apt install python3-pip -y && pip install docker && pip install docker-compose"
+      
+    - name: start docker
+      service:
+        name: docker
+        state: started        
+    
+     - name: pull an image filebeat
+       when: version_stack == "6.7.2"
+       community.docker.docker_image:
+         name: elastic/filebeat:6.7.2
+         source: pull
+         
+     - name: pull an image elasticsearch
+       when: version_stack == "6.7.2"
+       community.docker.docker_image:
+         name: elasticsearch:6.7.2
+         source: pull
+         
+     - name: pull an image logstash
+       when: version_stack == "6.7.2"
+       community.docker.docker_image:
+         name: logstash:6.7.2
+         source: pull
+         
+     - name: pull an image kibana
+       when: version_stack == "6.7.2"
+       community.docker.docker_image:
+         name: kibana:6.7.2
+         source: pull
+
+     - name: pull an image filebeat
+       when: version_stack == "7.7.0"
+       community.docker.docker_image:
+         name: elastic/filebeat:7.7.0
+         source: pull
+         
+     - name: pull an image elasticsearch
+       when: version_stack == "7.7.0"
+       community.docker.docker_image:
+         name: elasticsearch:7.7.0
+         source: pull
+         
+     - name: pull an image logstash
+       when: version_stack == "7.7.0"
+       community.docker.docker_image:
+         name: logstash:7.7.0
+         source: pull
+         
+     - name: pull an image kibana
+       when: version_stack == "7.7.0"
+       community.docker.docker_image:
+         name: kibana:7.7.0
+         source: pull                  
+
+     - name: Create and start services v_6.7.2
+       when: version_stack == "6.7.2"
+       community.docker.docker_compose:
+         project_src: "/home/andr/ansible_ELKF/elkf_6.7.2"
+       register: output
+
+     - name: Create and start services v_7.7.0
+       when: version_stack == "7.7.0"
+       community.docker.docker_compose:
+         project_src: "/home/andr/ansible_ELKF/elkf_7.7.0"
+       register: output
